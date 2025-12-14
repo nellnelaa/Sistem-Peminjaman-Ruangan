@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum prodi_enum {
+  Informatika
+  Sistem_Informasi @map("Sistem Informasi")
+  Sains_Data       @map("Sains Data")
+  Bisnis_Digital   @map("Bisnis Digital")
+  Lainnya
+}
+
+enum jabatan_enum {
+  mahasiswa
+  TU
+  Dekan
+  Wadek_1 @map("Wadek 1")
+  Wadek_2 @map("Wadek 2")
+  Wadek_3 @map("Wadek 3")
+}
+
+enum ruangan_gedung_enum {
+  FIK1 @map("FIK1")
+  FIK2 @map("FIK2")
+}
+
+enum ruangan_lantai_enum {
+  Satu @map("1")
+  Dua  @map("2")
+  Tiga @map("3")
+}
+
+enum ruangan_status_enum {
+  Tersedia
+  Tidak_Tersedia @map("Tidak_Tersedia")
+  Perbaikan
+}
+
+enum ruangan_jenis_enum {
+  Seminar
+  Kelas
+  Lab
+  dll
+}
+
+enum fasilitas_kondisi_enum {
+  baik
+  rusak
+}
+
+enum peminjaman_status_enum {
+  Menunggu
+  Review
+  Disetujui
+  Ditolak
+  Revisi
+  Selesai  
+}
+
+enum verifikasi_status_enum {
+  Valid
+  Tidak_Valid @map("Tidak_Valid")
+}
+
+model users {
+  id       BigInt        @id @default(autoincrement())
+  name     String?       @db.VarChar(255)
+  email    String?       @unique @db.VarChar(255)
+  password String?       @db.VarChar(255)
+  no_pokok String?       @unique @db.VarChar
+  prodi    prodi_enum?
+  fakultas String?       @db.VarChar(255)
+  jabatan  jabatan_enum?
+  role_id  Int?          @default(2)
+
+  peminjaman peminjaman[]
+}
+
+model ruangan {
+  id           BigInt               @id @default(autoincrement())
+  nama_ruangan String?
+  Gedung       ruangan_gedung_enum?
+  lantai       ruangan_lantai_enum?
+  kapasitas    Int?
+  status       ruangan_status_enum?
+  jenis        ruangan_jenis_enum?
+
+  peminjaman peminjaman[]
+  fasilitas  fasilitas[]
+}
+
+model fasilitas_details {
+  id   BigInt  @id @default(autoincrement())
+  nama String?
+
+  fasilitas fasilitas[]
+}
+
+model fasilitas {
+  id                   BigInt  @id @default(autoincrement())
+  ruangan_id           BigInt?
+  fasilitas_details_id BigInt? @map("fasilitas_details")
+
+  jumlah  Int?
+  kondisi fasilitas_kondisi_enum?
+
+  ruangan               ruangan?           @relation(fields: [ruangan_id], references: [id])
+  fasilitas_details_rel fasilitas_details? @relation(fields: [fasilitas_details_id], references: [id])
+}
+
+model peminjaman {
+  id                 BigInt                  @id @default(autoincrement())
+  user_id            BigInt? // FK ke users (Pengaju)
+  ruangan_id         BigInt?
+  nama_kegiatan      String?
+  deskripsi_kegiatan String?
+  jumlah_peserta     Int?
+  tanggal_kegiatan   DateTime?
+  jam_mulai          String?
+  jam_selesai        String?
+  dosen_pendamping   String?
+  cs_pendamping      String?
+  satpam_pendamping  String?
+  status_peminjaman  peminjaman_status_enum?
+
+  created_at DateTime @default(now()) @db.Timestamp(6)
+
+  catatan_admin    String?
+  alasan_penolakan String?
+  updated_at       DateTime @default(now()) @db.Timestamp(6)
+
+  dokumen_peminjaman dokumen_peminjaman[]
+  ruangan            ruangan?             @relation(fields: [ruangan_id], references: [id])
+
+  users users? @relation(fields: [user_id], references: [id])
+}
+
+model template_berkas {
+  id          BigInt   @id @default(autoincrement())
+  nama_berkas String?
+  file_path   String?
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+
+  dokumen_peminjaman dokumen_peminjaman[]
+}
+
+model dokumen_peminjaman {
+  id                BigInt                  @id @default(autoincrement())
+  peminjaman_id     BigInt?
+  berkas_id         BigInt?
+  file_url          String?
+  status_verifikasi verifikasi_status_enum?
+  created_at        DateTime                @default(now()) @db.Timestamp(6)
+
+  catatan_verifikator String?
+  updated_at          DateTime @default(now()) @db.Timestamp(6)
+
+  template_berkas template_berkas? @relation(fields: [berkas_id], references: [id])
+  peminjaman      peminjaman?      @relation(fields: [peminjaman_id], references: [id])
+}
+
+model DocumentValidation {
+  id        String   @id @default(uuid())
+  filename  String
+  fileUrl   String   // Lokasi penyimpanan PDF (disimpan di folder server)
+  status    String   // "VALID" | "INVALID"
+  message   String?
+  createdAt DateTime @default(now())
+}
