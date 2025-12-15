@@ -43,7 +43,8 @@ const Navbar = () => {
   const navItems = [
     { label: "Beranda", path: "/" },
     { label: "Dokumen", path: "/dokumen" },
-    { label: "Ruangan Tersedia", path: "/ruangan" },
+    { label: "Ruangan", path: "/ruangan" },
+    { label: "Berlangsung", path: "/berlangsung" },
     { label: "Masuk", path: "/login" },
   ];
 
@@ -91,7 +92,7 @@ const Navbar = () => {
             // Admin user - show navigation + admin access + profile
             <>
               <div className="flex gap-1">
-                {navItems.slice(0, 3).map((item) => {
+                {navItems.slice(0, 4).map((item) => {
                   const isActive = currentPath === item.path;
                   return (
                     <Link
@@ -131,7 +132,7 @@ const Navbar = () => {
             // Regular user - show navigation + profile and logout
             <>
               <div className="flex gap-1">
-                {navItems.slice(0, 3).map((item) => {
+                {navItems.slice(0, 4).map((item) => {
                   const isActive = currentPath === item.path;
                   return (
                     <Link
@@ -147,8 +148,20 @@ const Navbar = () => {
                     </Link>
                   );
                 })}
+                <a
+                  href="/pengajuan"
+                  className="px-5 py-2 rounded-lg font-medium transition-all duration-200 text-white hover:bg-orange-600"
+                >
+                  Pengajuan
+                </a>
+                <a
+                  href="/riwayat"
+                  className="px-5 py-2 rounded-lg font-medium transition-all duration-200 text-white hover:bg-orange-600"
+                >
+                  riwayat
+                </a>
               </div>
-              <a
+              {/* <a
                 href="/pengajuan"
                 className="px-5 py-2 rounded-lg font-medium transition-all duration-200 text-white hover:bg-orange-600"
               >
@@ -159,13 +172,8 @@ const Navbar = () => {
                 className="px-5 py-2 rounded-lg font-medium transition-all duration-200 text-white hover:bg-orange-600"
               >
                 riwayat
-              </a>
+              </a> */}
               <div className="flex items-center gap-3">
-                {/* <img
-                  src={user?.profile_picture || "/image/default-avatar.png"}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white"
-                /> */}
                 <span className="font-medium text-white">{user?.name}</span>
               </div>
               <button
@@ -210,7 +218,8 @@ const Navbar = () => {
               // Admin mobile menu
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  {navItems.slice(0, 3).map((item) => {
+                  {navItems.slice(0, 4
+                  ).map((item) => {
                     const isActive = currentPath === item.path;
                     return (
                       <Link
@@ -257,7 +266,7 @@ const Navbar = () => {
               // Regular user mobile menu
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  {navItems.slice(0, 3).map((item) => {
+                  {navItems.slice(0, 4).map((item) => {
                     const isActive = currentPath === item.path;
                     return (
                       <Link

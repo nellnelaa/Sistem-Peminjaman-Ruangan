@@ -22,6 +22,7 @@ import { Route as PengajuanImport } from './routes/pengajuan'
 import { Route as InformasiImport } from './routes/informasi'
 import { Route as ForgetpassImport } from './routes/forgetpass'
 import { Route as DokumenImport } from './routes/dokumen'
+import { Route as BerlangsungImport } from './routes/berlangsung'
 import { Route as RuanganIndexImport } from './routes/ruangan/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as AdminPeminjamanIndexImport } from './routes/admin/peminjaman/index'
@@ -129,6 +130,12 @@ const ForgetpassRoute = ForgetpassImport.update({
 const DokumenRoute = DokumenImport.update({
   id: '/dokumen',
   path: '/dokumen',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BerlangsungRoute = BerlangsungImport.update({
+  id: '/berlangsung',
+  path: '/berlangsung',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -350,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/berlangsung': {
+      id: '/berlangsung'
+      path: '/berlangsung'
+      fullPath: '/berlangsung'
+      preLoaderRoute: typeof BerlangsungImport
       parentRoute: typeof rootRoute
     }
     '/dokumen': {
@@ -611,6 +625,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/berlangsung': typeof BerlangsungRoute
   '/dokumen': typeof DokumenRoute
   '/forgetpass': typeof ForgetpassRoute
   '/informasi': typeof InformasiRoute
@@ -651,6 +666,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/berlangsung': typeof BerlangsungRoute
   '/dokumen': typeof DokumenRoute
   '/forgetpass': typeof ForgetpassRoute
   '/informasi': typeof InformasiRoute
@@ -692,6 +708,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/berlangsung': typeof BerlangsungRoute
   '/dokumen': typeof DokumenRoute
   '/forgetpass': typeof ForgetpassRoute
   '/informasi': typeof InformasiRoute
@@ -734,6 +751,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/berlangsung'
     | '/dokumen'
     | '/forgetpass'
     | '/informasi'
@@ -773,6 +791,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/berlangsung'
     | '/dokumen'
     | '/forgetpass'
     | '/informasi'
@@ -812,6 +831,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/berlangsung'
     | '/dokumen'
     | '/forgetpass'
     | '/informasi'
@@ -853,6 +873,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  BerlangsungRoute: typeof BerlangsungRoute
   DokumenRoute: typeof DokumenRoute
   ForgetpassRoute: typeof ForgetpassRoute
   InformasiRoute: typeof InformasiRoute
@@ -893,6 +914,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  BerlangsungRoute: BerlangsungRoute,
   DokumenRoute: DokumenRoute,
   ForgetpassRoute: ForgetpassRoute,
   InformasiRoute: InformasiRoute,
@@ -942,6 +964,7 @@ export const routeTree = rootRoute
       "filePath": "__root.jsx",
       "children": [
         "/",
+        "/berlangsung",
         "/dokumen",
         "/forgetpass",
         "/informasi",
@@ -982,6 +1005,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.lazy.jsx"
+    },
+    "/berlangsung": {
+      "filePath": "berlangsung.jsx"
     },
     "/dokumen": {
       "filePath": "dokumen.jsx"

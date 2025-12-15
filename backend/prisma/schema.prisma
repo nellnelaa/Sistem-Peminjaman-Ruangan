@@ -87,8 +87,11 @@ model ruangan {
   Gedung       ruangan_gedung_enum?
   lantai       ruangan_lantai_enum?
   kapasitas    Int?
-  status       ruangan_status_enum?
+  status       ruangan_status_enum? 
   jenis        ruangan_jenis_enum?
+  
+  is_available Boolean? @default(true) 
+  current_booking_id BigInt? 
 
   peminjaman peminjaman[]
   fasilitas  fasilitas[]
