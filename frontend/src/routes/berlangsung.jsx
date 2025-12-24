@@ -29,23 +29,6 @@ function Berlangsung() {
     queryFn: () => getPeminjamans(),
   });
 
-  console.log("aaaa", peminjamanData);
-  // Debug: Log peminjaman data
-  useEffect(() => {
-    if (peminjamanData) {
-      console.log("Total peminjaman:", peminjamanData.length);
-      console.log(
-        "Sample peminjaman dates:",
-        peminjamanData.slice(0, 5).map((p) => ({
-          id: p.id,
-          nama: p.nama_kegiatan,
-          tanggal: p.tanggal_kegiatan,
-          tanggal_only: p.tanggal_kegiatan?.split("T")[0],
-        }))
-      );
-    }
-  }, [peminjamanData]);
-
   // Get month and year
   const month = currentDate.getMonth();
   const year = currentDate.getFullYear();
@@ -115,11 +98,6 @@ function Berlangsung() {
         icon: Clock,
         label: "Menunggu",
       },
-      Review: {
-        color: "bg-blue-100 text-blue-700 border-blue-300",
-        icon: Loader,
-        label: "Review",
-      },
       Disetujui: {
         color: "bg-green-100 text-green-700 border-green-300",
         icon: CheckCircle,
@@ -135,11 +113,6 @@ function Berlangsung() {
         icon: FileEdit,
         label: "Revisi",
       },
-      Selesai: {
-        color: "bg-gray-100 text-gray-700 border-gray-300",
-        icon: CheckCircle,
-        label: "Selesai",
-      },
     };
     return statusMap[status] || statusMap.Menunggu;
   };
@@ -148,8 +121,7 @@ function Berlangsung() {
   const generateCalendarDays = () => {
     const days = [];
 
-    // Previous month days (Minggu = 0, Senin = 1, ..., Sabtu = 6)
-    // Kita ingin Minggu di kolom pertama, jadi tidak perlu adjustment
+    // Previous month days
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
       const day = daysInPrevMonth - i;
       const date = new Date(year, month - 1, day);
@@ -165,14 +137,6 @@ function Berlangsung() {
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const peminjaman = getPeminjamansForDate(date);
-
-      // Debug log for days with peminjaman
-      if (peminjaman.length > 0) {
-        console.log(
-          `Tanggal ${day}/${month + 1}/${year} memiliki ${peminjaman.length} peminjaman:`,
-          peminjaman.map((p) => p.nama_kegiatan)
-        );
-      }
 
       days.push({
         day,
@@ -214,12 +178,15 @@ function Berlangsung() {
     menunggu:
       peminjamanData?.filter((p) => p.status_peminjaman === "Menunggu")
         .length || 0,
-    review:
-      peminjamanData?.filter((p) => p.status_peminjaman === "Review").length ||
-      0,
     disetujui:
       peminjamanData?.filter((p) => p.status_peminjaman === "Disetujui")
         .length || 0,
+    ditolak:
+      peminjamanData?.filter((p) => p.status_peminjaman === "Ditolak").length ||
+      0,
+    revisi:
+      peminjamanData?.filter((p) => p.status_peminjaman === "Revisi").length ||
+      0,
   };
 
   if (isLoading) {
@@ -249,11 +216,11 @@ function Berlangsung() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Peminjaman</p>
+                <p className="text-sm text-gray-600">Total</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {stats.total}
                 </p>
@@ -277,24 +244,36 @@ function Berlangsung() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Review</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  {stats.review}
-                </p>
-              </div>
-              <Loader className="h-8 w-8 text-blue-500" />
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
                 <p className="text-sm text-gray-600">Disetujui</p>
                 <p className="text-2xl font-bold text-green-600">
                   {stats.disetujui}
                 </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Ditolak</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {stats.ditolak}
+                </p>
+              </div>
+              <XCircle className="h-8 w-8 text-red-500" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Revisi</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {stats.revisi}
+                </p>
+              </div>
+              <FileEdit className="h-8 w-8 text-orange-500" />
             </div>
           </div>
         </div>
@@ -412,28 +391,25 @@ function Berlangsung() {
               <p className="text-sm font-semibold text-gray-700 mb-3">
                 Keterangan Status:
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {[
-                  "Menunggu",
-                  "Review",
-                  "Disetujui",
-                  "Ditolak",
-                  "Revisi",
-                  "Selesai",
-                ].map((status) => {
-                  const statusInfo = getStatusInfo(status);
-                  const Icon = statusInfo.icon;
-                  return (
-                    <div key={status} className="flex items-center gap-2">
-                      <div
-                        className={`px-2 py-1 rounded text-xs ${statusInfo.color} border flex items-center gap-1`}
-                      >
-                        <Icon className="h-3 w-3" />
-                        <span className="font-medium">{statusInfo.label}</span>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {["Menunggu", "Disetujui", "Ditolak", "Revisi"].map(
+                  (status) => {
+                    const statusInfo = getStatusInfo(status);
+                    const Icon = statusInfo.icon;
+                    return (
+                      <div key={status} className="flex items-center gap-2">
+                        <div
+                          className={`px-2 py-1 rounded text-xs ${statusInfo.color} border flex items-center gap-1`}
+                        >
+                          <Icon className="h-3 w-3" />
+                          <span className="font-medium">
+                            {statusInfo.label}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  }
+                )}
               </div>
             </div>
           </div>

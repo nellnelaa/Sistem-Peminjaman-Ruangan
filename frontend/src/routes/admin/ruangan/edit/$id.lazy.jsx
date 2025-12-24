@@ -384,8 +384,6 @@ function EditRuangan() {
   );
 }
 
-/* 🔧 COMPONENT REUSABLE AGAR TAMPILAN RAPI DAN SAMA */
-
 function InputField({ label, error, required, ...rest }) {
   return (
     <div>

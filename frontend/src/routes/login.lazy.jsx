@@ -111,12 +111,6 @@ function Login() {
               Daftar
             </Link>
           </p>
-          <Link
-            to="/forgetpass"
-            className="block text-blue-600 hover:text-blue-700"
-          >
-            Lupa password?
-          </Link>
         </div>
       </div>
     </div>

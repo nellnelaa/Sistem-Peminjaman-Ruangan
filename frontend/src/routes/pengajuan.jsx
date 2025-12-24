@@ -5,7 +5,8 @@ import "../index.css";
 import { useSelector } from "react-redux";
 import { createPeminjaman } from "../service/peminjaman";
 import { getRuangans } from "../service/ruangan";
-import { getTemplates } from "../service/templateBerkas"; // Service baru untuk fetch template
+import { getTemplates } from "../service/templateBerkas";
+import { getPeminjamans } from "../service/peminjaman"; // Import untuk cek peminjaman
 
 export const Route = createFileRoute("/pengajuan")({
   component: PengajuanPeminjaman,
@@ -15,15 +16,13 @@ function PengajuanPeminjaman() {
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  // Ruangan data
   const [ruangans, setRuangans] = useState([]);
   const [loadingRuangans, setLoadingRuangans] = useState(true);
+  const [peminjamansDisetujui, setPeminjamansDisetujui] = useState([]);
 
-  // Template Berkas data
   const [templateBerkas, setTemplateBerkas] = useState([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
-  // Form state - sesuai dengan backend schema
   const [ruanganId, setRuanganId] = useState("");
   const [namaKegiatan, setNamaKegiatan] = useState("");
   const [deskripsiKegiatan, setDeskripsiKegiatan] = useState("");
@@ -35,14 +34,10 @@ function PengajuanPeminjaman() {
   const [csPendamping, setCsPendamping] = useState("");
   const [satpamPendamping, setSatpamPendamping] = useState("");
 
-  // Document uploads by template
-  // Format: { templateId: File }
   const [dokumenByTemplate, setDokumenByTemplate] = useState({});
-
-  // Loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch ruangans on mount
+  // Fetch ruangans yang tersedia
   useEffect(() => {
     const fetchRuangans = async () => {
       try {
@@ -60,7 +55,23 @@ function PengajuanPeminjaman() {
     }
   }, [token]);
 
-  // Fetch template berkas on mount
+  // Fetch peminjaman yang disetujui
+  useEffect(() => {
+    const fetchPeminjamansDisetujui = async () => {
+      try {
+        const data = await getPeminjamans({ status_peminjaman: "Disetujui" });
+        setPeminjamansDisetujui(data);
+      } catch (error) {
+        console.error("Gagal memuat data peminjaman:", error);
+      }
+    };
+
+    if (token) {
+      fetchPeminjamansDisetujui();
+    }
+  }, [token]);
+
+  // Fetch templates
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
@@ -78,12 +89,78 @@ function PengajuanPeminjaman() {
     }
   }, [token]);
 
+  // Fungsi untuk mengecek apakah waktu bertabrakan
+  const isTimeOverlap = (start1, end1, start2, end2) => {
+    return start1 < end2 && start2 < end1;
+  };
+
+  // Fungsi untuk mengecek ketersediaan ruangan
+  const checkRuanganAvailability = (
+    ruanganId,
+    tanggal,
+    jamMulai,
+    jamSelesai
+  ) => {
+    if (!tanggal || !jamMulai || !jamSelesai) {
+      return { available: true, conflictingBooking: null };
+    }
+
+    const conflictingBooking = peminjamansDisetujui.find((peminjaman) => {
+      // Cek apakah ruangan sama
+      if (peminjaman.ruangan_id !== parseInt(ruanganId)) {
+        return false;
+      }
+
+      // Cek apakah tanggal sama
+      const peminjamanDate = new Date(peminjaman.tanggal_kegiatan)
+        .toISOString()
+        .split("T")[0];
+      if (peminjamanDate !== tanggal) {
+        return false;
+      }
+
+      // Cek apakah waktu bertabrakan
+      return isTimeOverlap(
+        jamMulai,
+        jamSelesai,
+        peminjaman.jam_mulai,
+        peminjaman.jam_selesai
+      );
+    });
+
+    return {
+      available: !conflictingBooking,
+      conflictingBooking,
+    };
+  };
+
+  // Filter ruangan yang tersedia berdasarkan tanggal dan waktu
+  const getAvailableRuangans = () => {
+    if (!tanggalKegiatan || !jamMulai || !jamSelesai) {
+      return ruangans;
+    }
+
+    return ruangans.map((ruangan) => {
+      const { available, conflictingBooking } = checkRuanganAvailability(
+        ruangan.id,
+        tanggalKegiatan,
+        jamMulai,
+        jamSelesai
+      );
+
+      return {
+        ...ruangan,
+        available,
+        conflictingBooking,
+      };
+    });
+  };
+
   const handleFileUploadForTemplate = (templateId, event) => {
     const file = event.target.files[0];
 
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = [
       "application/pdf",
       "application/msword",
@@ -100,7 +177,6 @@ function PengajuanPeminjaman() {
       return;
     }
 
-    // Validate file size (10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error("Ukuran file maksimal 10MB");
       return;
@@ -127,7 +203,6 @@ function PengajuanPeminjaman() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Validation
     if (!ruanganId) {
       toast.error("Mohon pilih ruangan");
       return;
@@ -143,16 +218,29 @@ function PengajuanPeminjaman() {
       return;
     }
 
-    // Validate jam
     if (jamMulai >= jamSelesai) {
       toast.error("Jam mulai harus lebih awal dari jam selesai");
+      return;
+    }
+
+    // Validasi ketersediaan ruangan
+    const { available, conflictingBooking } = checkRuanganAvailability(
+      ruanganId,
+      tanggalKegiatan,
+      jamMulai,
+      jamSelesai
+    );
+
+    if (!available) {
+      toast.error(
+        `Ruangan tidak tersedia pada waktu yang dipilih. Sudah ada peminjaman untuk kegiatan "${conflictingBooking.nama_kegiatan}" pada ${conflictingBooking.jam_mulai} - ${conflictingBooking.jam_selesai}`
+      );
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Prepare dokumen files and berkas_ids arrays
       const dokumenFiles = [];
       const dokumenBerkasIds = [];
 
@@ -205,6 +293,8 @@ function PengajuanPeminjaman() {
     );
   }
 
+  const availableRuangans = getAvailableRuangans();
+
   return (
     <>
       <div className="min-h-screen bg-gray-50 pt-24 pb-12">
@@ -224,6 +314,65 @@ function PengajuanPeminjaman() {
                 Data Kegiatan
               </h2>
 
+              {/* Tanggal & Waktu - Dipindah ke atas */}
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800 mb-3 font-medium">
+                  ℹ️ Pilih tanggal dan waktu terlebih dahulu untuk melihat
+                  ruangan yang tersedia
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-gray-900 font-semibold mb-2">
+                      Tanggal Kegiatan <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={tanggalKegiatan}
+                      onChange={(e) => {
+                        setTanggalKegiatan(e.target.value);
+                        setRuanganId(""); // Reset pilihan ruangan
+                      }}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      required
+                      min={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-900 font-semibold mb-2">
+                      Jam Mulai <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      value={jamMulai}
+                      onChange={(e) => {
+                        setJamMulai(e.target.value);
+                        setRuanganId(""); // Reset pilihan ruangan
+                      }}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-900 font-semibold mb-2">
+                      Jam Selesai <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      value={jamSelesai}
+                      onChange={(e) => {
+                        setJamSelesai(e.target.value);
+                        setRuanganId(""); // Reset pilihan ruangan
+                      }}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Pilih Ruangan */}
               <div className="mb-4">
                 <label className="block text-gray-900 font-semibold mb-2">
@@ -232,20 +381,54 @@ function PengajuanPeminjaman() {
                 {loadingRuangans ? (
                   <div className="text-gray-500">Memuat data ruangan...</div>
                 ) : (
-                  <select
-                    value={ruanganId}
-                    onChange={(e) => setRuanganId(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    required
-                  >
-                    <option value="">Pilih ruangan</option>
-                    {ruangans.map((ruangan) => (
-                      <option key={ruangan.id} value={ruangan.id}>
-                        {ruangan.nama_ruangan} - {ruangan.Gedung} Lantai{" "}
-                        {ruangan.lantai} (Kapasitas: {ruangan.kapasitas})
-                      </option>
-                    ))}
-                  </select>
+                  <>
+                    <select
+                      value={ruanganId}
+                      onChange={(e) => setRuanganId(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      required
+                    >
+                      <option value="">Pilih ruangan</option>
+                      {availableRuangans.map((ruangan) => (
+                        <option
+                          key={ruangan.id}
+                          value={ruangan.id}
+                          disabled={!ruangan.available}
+                          className={!ruangan.available ? "text-gray-400" : ""}
+                        >
+                          {ruangan.nama_ruangan} - {ruangan.Gedung} Lantai{" "}
+                          {ruangan.lantai} (Kapasitas: {ruangan.kapasitas})
+                          {!ruangan.available ? " - TIDAK TERSEDIA" : ""}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Tampilkan info ruangan yang tidak tersedia */}
+                    {tanggalKegiatan && jamMulai && jamSelesai && (
+                      <div className="mt-3">
+                        {availableRuangans.filter((r) => !r.available).length >
+                          0 && (
+                          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p className="text-sm text-yellow-800 font-medium mb-2">
+                              ⚠️ Ruangan yang tidak tersedia:
+                            </p>
+                            <ul className="text-sm text-yellow-700 space-y-1">
+                              {availableRuangans
+                                .filter((r) => !r.available)
+                                .map((r) => (
+                                  <li key={r.id}>
+                                    • {r.nama_ruangan} - Sudah dipesan untuk "
+                                    {r.conflictingBooking.nama_kegiatan}" (
+                                    {r.conflictingBooking.jam_mulai} -{" "}
+                                    {r.conflictingBooking.jam_selesai})
+                                  </li>
+                                ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -278,69 +461,20 @@ function PengajuanPeminjaman() {
                 />
               </div>
 
-              {/* Jumlah Peserta & Tanggal */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-gray-900 font-semibold mb-2">
-                    Jumlah Peserta <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={jumlahPeserta}
-                    onChange={(e) => setJumlahPeserta(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    placeholder="Jumlah peserta"
-                    min="1"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-900 font-semibold mb-2">
-                    Tanggal Kegiatan <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={tanggalKegiatan}
-                    onChange={(e) => setTanggalKegiatan(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    required
-                    min={new Date().toISOString().split("T")[0]}
-                  />
-                </div>
-              </div>
-
-              {/* Waktu Kegiatan */}
+              {/* Jumlah Peserta */}
               <div className="mb-4">
                 <label className="block text-gray-900 font-semibold mb-2">
-                  Waktu Kegiatan <span className="text-red-500">*</span>
+                  Jumlah Peserta <span className="text-red-500">*</span>
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">
-                      Jam Mulai
-                    </label>
-                    <input
-                      type="time"
-                      value={jamMulai}
-                      onChange={(e) => setJamMulai(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">
-                      Jam Selesai
-                    </label>
-                    <input
-                      type="time"
-                      value={jamSelesai}
-                      onChange={(e) => setJamSelesai(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      required
-                    />
-                  </div>
-                </div>
+                <input
+                  type="number"
+                  value={jumlahPeserta}
+                  onChange={(e) => setJumlahPeserta(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  placeholder="Jumlah peserta"
+                  min="1"
+                  required
+                />
               </div>
 
               {/* Penanggung Jawab */}
@@ -377,7 +511,7 @@ function PengajuanPeminjaman() {
             {/* Upload Dokumen Section */}
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                Upload Dokumen 
+                Upload Dokumen
               </h2>
               <p className="text-sm text-gray-600 mb-6">
                 Upload dokumen sesuai dengan template yang tersedia (opsional).
@@ -430,7 +564,6 @@ function PengajuanPeminjaman() {
                       </div>
 
                       {dokumenByTemplate[template.id] ? (
-                        // File already selected
                         <div className="flex items-center justify-between p-3 bg-white border border-gray-300 rounded-lg">
                           <div className="flex items-center flex-1 min-w-0">
                             <svg
@@ -480,7 +613,6 @@ function PengajuanPeminjaman() {
                           </button>
                         </div>
                       ) : (
-                        // No file selected yet
                         <label className="block">
                           <div className="px-4 py-3 bg-white border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-orange-500 hover:bg-orange-50 transition-colors">
                             <svg

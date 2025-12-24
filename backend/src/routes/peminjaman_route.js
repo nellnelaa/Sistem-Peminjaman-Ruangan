@@ -22,7 +22,6 @@ const router = express.Router();
 router
   .route("/")
   .get(
-    authorization(adminRole, mahasiswa),
     validateGetPeminjamans,
     getPeminjamansController
   )

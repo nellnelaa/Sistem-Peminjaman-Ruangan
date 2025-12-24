@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { getRuangans } from "../../service/ruangan";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -20,8 +20,10 @@ export const Route = createFileRoute("/ruangan/")({
 
 function RuanganList() {
   const navigate = useNavigate();
+
+  // State untuk search dan filter
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    nama_ruangan: "",
     Gedung: "",
     lantai: "",
     status: "",
@@ -35,9 +37,43 @@ function RuanganList() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["ruangans", filters],
-    queryFn: () => getRuangans(filters),
+    queryKey: ["ruangans"],
+    queryFn: () => getRuangans({}), 
   });
+  
+  const filteredRuangans = useMemo(() => {
+    if (!ruangans) return [];
+
+    return ruangans.filter((ruangan) => {
+      
+      const matchesSearch = ruangan.nama_ruangan
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+        
+      const matchesGedung =
+        !filters.Gedung || ruangan.Gedung === filters.Gedung;
+
+      // Filter by Lantai
+      const matchesLantai =
+        !filters.lantai || ruangan.lantai === filters.lantai;
+
+      // Filter by Status
+      const matchesStatus =
+        !filters.status || ruangan.status === filters.status;
+
+      // Filter by Jenis
+      const matchesJenis = !filters.jenis || ruangan.jenis === filters.jenis;
+
+      return (
+        matchesSearch &&
+        matchesGedung &&
+        matchesLantai &&
+        matchesStatus &&
+        matchesJenis
+      );
+    });
+  }, [ruangans, searchTerm, filters]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({
@@ -47,8 +83,8 @@ function RuanganList() {
   };
 
   const resetFilters = () => {
+    setSearchTerm("");
     setFilters({
-      nama_ruangan: "",
       Gedung: "",
       lantai: "",
       status: "",
@@ -133,10 +169,8 @@ function RuanganList() {
                 type="text"
                 placeholder="Cari nama ruangan..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                value={filters.nama_ruangan}
-                onChange={(e) =>
-                  handleFilterChange("nama_ruangan", e.target.value)
-                }
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
@@ -233,15 +267,17 @@ function RuanganList() {
         <div className="mb-4">
           <p className="text-gray-600">
             Ditemukan{" "}
-            <span className="font-semibold">{ruangans?.length || 0}</span>{" "}
+            <span className="font-semibold">
+              {filteredRuangans?.length || 0}
+            </span>{" "}
             ruangan
           </p>
         </div>
 
         {/* Ruangan Grid */}
-        {ruangans && ruangans.length > 0 ? (
+        {filteredRuangans && filteredRuangans.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ruangans.map((ruangan) => (
+            {filteredRuangans.map((ruangan) => (
               <div
                 key={ruangan.id}
                 className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer"
@@ -323,7 +359,9 @@ function RuanganList() {
             <FaBuilding className="text-6xl text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">Tidak ada ruangan ditemukan</p>
             <p className="text-gray-400 text-sm mt-2">
-              Coba ubah filter pencarian Anda
+              {searchTerm || Object.values(filters).some((f) => f)
+                ? "Coba ubah kata kunci pencarian atau filter Anda"
+                : "Belum ada data ruangan yang tersedia"}
             </p>
           </div>
         )}

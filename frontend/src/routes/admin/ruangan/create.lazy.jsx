@@ -58,7 +58,7 @@ function CreateRuangan() {
     { value: "Tiga", label: "Lantai 3" },
   ];
   const statusOptions = ["Tersedia", "Tidak_Tersedia", "Perbaikan"];
-  const jenisOptions = ["Seminar", "Kelas", "Lab", "dll"];
+  const jenisOptions = ["Seminar", "Kelas", "Lab", "lainnya"];
   const kondisiOptions = ["baik", "rusak"];
 
   const handleInputChange = (e) => {

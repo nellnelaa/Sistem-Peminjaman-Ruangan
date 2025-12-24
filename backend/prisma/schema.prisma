@@ -45,7 +45,7 @@ enum ruangan_jenis_enum {
   Seminar
   Kelas
   Lab
-  dll
+  lainnya
 }
 
 enum fasilitas_kondisi_enum {
@@ -55,11 +55,9 @@ enum fasilitas_kondisi_enum {
 
 enum peminjaman_status_enum {
   Menunggu
-  Review
   Disetujui
   Ditolak
-  Revisi
-  Selesai  
+  Revisi 
 }
 
 enum verifikasi_status_enum {
@@ -89,9 +87,6 @@ model ruangan {
   kapasitas    Int?
   status       ruangan_status_enum? 
   jenis        ruangan_jenis_enum?
-  
-  is_available Boolean? @default(true) 
-  current_booking_id BigInt? 
 
   peminjaman peminjaman[]
   fasilitas  fasilitas[]

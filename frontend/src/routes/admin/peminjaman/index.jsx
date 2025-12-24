@@ -63,11 +63,9 @@ function PeminjamanPage() {
   const getStatusBadge = (status) => {
     const statusConfig = {
       Menunggu: { color: "bg-yellow-100 text-yellow-800", label: "Menunggu" },
-      Review: { color: "bg-blue-100 text-blue-800", label: "Review" },
       Disetujui: { color: "bg-green-100 text-green-800", label: "Disetujui" },
       Ditolak: { color: "bg-red-100 text-red-800", label: "Ditolak" },
       Revisi: { color: "bg-orange-100 text-orange-800", label: "Revisi" },
-      Selesai: { color: "bg-gray-100 text-gray-800", label: "Selesai" },
     };
 
     const config = statusConfig[status] || statusConfig.Menunggu;
@@ -164,16 +162,6 @@ function PeminjamanPage() {
                 Menunggu
               </button>
               <button
-                onClick={() => setStatusFilter("Review")}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  statusFilter === "Review"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Review
-              </button>
-              <button
                 onClick={() => setStatusFilter("Disetujui")}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   statusFilter === "Disetujui"
@@ -202,16 +190,6 @@ function PeminjamanPage() {
                 }`}
               >
                 Revisi
-              </button>
-              <button
-                onClick={() => setStatusFilter("Selesai")}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  statusFilter === "Selesai"
-                    ? "bg-gray-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                Selesai
               </button>
             </div>
           </div>

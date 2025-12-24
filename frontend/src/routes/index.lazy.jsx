@@ -139,7 +139,7 @@ function Index() {
               <p className="font-semibold text-gray-800">
                 Pinjam ruangan
                 <br />
-                fakultas ilmu komputer
+                Fakultas Ilmu Komputer
               </p>
             </div>
           </div>

@@ -12,7 +12,6 @@ function Dokumen() {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchTemplates();
@@ -31,16 +30,6 @@ function Dokumen() {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    fetchTemplates(searchQuery);
-  };
-
-  const handleReset = () => {
-    setSearchQuery("");
-    fetchTemplates("");
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-16">
@@ -52,37 +41,6 @@ function Dokumen() {
           <p className="text-lg text-gray-700">
             Unduh template dokumen yang diperlukan untuk peminjaman ruangan
           </p>
-        </div>
-
-        {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari template dokumen..."
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300"
-            >
-              Cari
-            </button>
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={handleReset}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300"
-              >
-                Reset
-              </button>
-            )}
-          </form>
         </div>
 
         {/* Loading State */}

@@ -129,13 +129,27 @@ function RuanganPage() {
                   <th className="table-head px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     No
                   </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Ruangan</th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gedung</th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">status</th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kapasitas</th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jenis</th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fasilitas</th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Nama Ruangan
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Gedung
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    status
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Kapasitas
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Jenis
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Fasilitas
+                  </th>
+                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Aksi
+                  </th>
                 </tr>
               </thead>
 
@@ -165,22 +179,36 @@ function RuanganPage() {
                       </td>
 
                       <td className="px-4 sm:px-6 py-4 text-sm text-gray-700">
-                        <ul className="list-disc ml-4">
-                          {item.fasilitas?.map((f) => (
-                            <li key={f.id}>
-                              {f.fasilitas_details_rel?.nama} ({f.jumlah}) –{" "}
-                              <span
-                                className={
-                                  f.kondisi === "baik"
-                                    ? "text-green-600"
-                                    : "text-red-600"
-                                }
-                              >
-                                {f.kondisi}
+                        {item.fasilitas && item.fasilitas.length > 0 ? (
+                          <div className="space-y-1">
+                            <ul className="list-disc ml-4 space-y-0.5">
+                              {item.fasilitas.slice(0, 3).map((f) => (
+                                <li key={f.id} className="text-xs">
+                                  {f.fasilitas_details_rel?.nama} ({f.jumlah}) –{" "}
+                                  <span
+                                    className={
+                                      f.kondisi === "baik"
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                    }
+                                  >
+                                    {f.kondisi}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+
+                            {item.fasilitas.length > 3 && (
+                              <span className="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded">
+                                +{item.fasilitas.length - 3} lainnya
                               </span>
-                            </li>
-                          ))}
-                        </ul>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs italic">
+                            Tidak ada fasilitas
+                          </span>
+                        )}
                       </td>
 
                       <td className="px-4 sm:px-6 py-4 text-sm font-medium">

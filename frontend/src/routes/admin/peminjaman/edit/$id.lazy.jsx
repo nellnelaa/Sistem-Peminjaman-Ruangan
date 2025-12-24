@@ -428,11 +428,9 @@ function EditPeminjaman() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 >
                   <option value="Menunggu">Menunggu</option>
-                  <option value="Review">Review</option>
                   <option value="Disetujui">Disetujui</option>
                   <option value="Ditolak">Ditolak</option>
                   <option value="Revisi">Revisi</option>
-                  <option value="Selesai">Selesai</option>
                 </select>
               </div>
 
