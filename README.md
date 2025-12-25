@@ -1,5 +1,5 @@
 <p align="right">✨ Final Project Manajemen Proyek Informatika ✨</p>
-<h1 align="center">SIPRESMARU</h1>
+<h1 align="center">SISTEM PEMINJAMAN RUANGAN </h1>
 <p align="center">
 <strong>Sistem Peminjaman Ruangan Terintegrasi</strong>
 </p>
