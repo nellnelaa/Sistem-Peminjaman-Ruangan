@@ -1,4 +1,3 @@
-// services/peminjaman_service.js
 const {
   getPeminjamansRepo,
   getPeminjamanByIdRepo,

@@ -12,12 +12,10 @@ const {
   InternalServerError,
 } = require("../utils/request.js");
 
-// GET ALL
 const getTemplatesService = async (nama) => {
   return getTemplatesRepo(nama);
 };
 
-// GET BY ID
 const getTemplateByIdService = async (id) => {
   const data = await getTemplateByIdRepo(id);
   if (!data) {
@@ -26,13 +24,11 @@ const getTemplateByIdService = async (id) => {
   return data;
 };
 
-// CREATE
 const createTemplateService = async (data) => {
   const created = await createTemplateRepo(data);
   return created;
 };
 
-// UPDATE
 const updateTemplateService = async (id, data) => {
   const existing = await getTemplateByIdRepo(id);
   if (!existing) {
@@ -47,7 +43,6 @@ const updateTemplateService = async (id, data) => {
   return updated;
 };
 
-// DELETE
 const deleteTemplateService = async (id) => {
   const existing = await getTemplateByIdRepo(id);
   if (!existing) {

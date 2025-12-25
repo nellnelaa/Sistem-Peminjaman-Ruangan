@@ -27,14 +27,12 @@ const getRuangansController = async (req, res) => {
 
 const getRuanganByIdController = async (req, res) => {
   const { id } = req.params;
-
   const data = await getRuanganByIdService(id);
   successResponse(res, data);
 };
 
 const createRuanganController = async (req, res) => {
   const { body } = req;
-
   const data = await createRuanganService(body);
   successResponse(res, data);
 };
@@ -42,14 +40,12 @@ const createRuanganController = async (req, res) => {
 const updateRuanganController = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
-
   const data = await updateRuanganService(id, body);
   successResponse(res, data);
 };
 
 const deleteRuanganController = async (req, res) => {
   const { id } = req.params;
-
   const data = await deleteRuanganService(id);
   successResponse(res, data);
 };

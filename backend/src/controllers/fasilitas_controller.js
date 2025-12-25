@@ -9,7 +9,6 @@ const {
 
 const getFasilsController = async (req, res) => {
   const { nama } = req.query;
-
   const data = await getFasilsService(nama);
 
   const message =
@@ -20,14 +19,12 @@ const getFasilsController = async (req, res) => {
 
 const getFasilByIdController = async (req, res) => {
   const { id } = req.params;
-
   const data = await getFasilByIdService(id);
   successResponse(res, data);
 };
 
 const createFasilController = async (req, res) => {
   const { body } = req;
-
   const data = await createFasilService(body);
   successResponse(res, data);
 };
@@ -35,7 +32,6 @@ const createFasilController = async (req, res) => {
 const updateFasilController = async (req, res) => {
   const { id } = req.params;
   const { body } = req;
-
   const data = await updateFasilService(id, body);
   if (!data) throw new BadRequestError("Missing update data.");
   successResponse(res, data);
@@ -43,7 +39,6 @@ const updateFasilController = async (req, res) => {
 
 const deleteFasilController = async (req, res) => {
   const { id } = req.params;
-
   const data = await deleteFasilService(id);
   successResponse(res, data);
 };

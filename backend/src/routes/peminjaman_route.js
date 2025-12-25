@@ -1,4 +1,3 @@
-// routes/peminjaman_route.js
 const express = require("express");
 const { authorization } = require("../middlewares/auth_middleware.js");
 const {

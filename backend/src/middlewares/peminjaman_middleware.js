@@ -1,4 +1,3 @@
-// middlewares/peminjaman_middleware.js
 const { z } = require("zod");
 const { BadRequestError } = require("../utils/request");
 
@@ -41,7 +40,6 @@ const validateCreatePeminjaman = async (req, res, next) => {
   if (req.body.jumlah_peserta) {
     req.body.jumlah_peserta = parseInt(req.body.jumlah_peserta);
   }
-
   if (req.body.dokumen_berkas_id) {
     if (typeof req.body.dokumen_berkas_id === "string") {
       req.body.dokumen_berkas_id = JSON.parse(req.body.dokumen_berkas_id);
@@ -83,7 +81,6 @@ const validateUpdatePeminjaman = async (req, res, next) => {
     throw new BadRequestError(resultValidateParams.error.errors);
   }
 
-  // Convert string numbers to integers
   if (req.body.ruangan_id) {
     req.body.ruangan_id = parseInt(req.body.ruangan_id);
   }
@@ -91,7 +88,6 @@ const validateUpdatePeminjaman = async (req, res, next) => {
     req.body.jumlah_peserta = parseInt(req.body.jumlah_peserta);
   }
 
-  // Parse dokumen berkas_id if exists
   if (req.body.dokumen_berkas_id) {
     if (typeof req.body.dokumen_berkas_id === "string") {
       req.body.dokumen_berkas_id = JSON.parse(req.body.dokumen_berkas_id);

@@ -3,7 +3,6 @@ const JSONBigInt = require("json-bigint");
 
 const prisma = new PrismaClient();
 
-// GET ALL (dengan optional search nama_berkas)
 const getTemplatesRepo = async (nama) => {
   let query = {};
 
@@ -29,7 +28,6 @@ const getTemplatesRepo = async (nama) => {
   return JSONBigInt.parse(serialized);
 };
 
-// GET BY ID
 const getTemplateByIdRepo = async (id) => {
   const template = await prisma.template_berkas.findFirst({
     where: { id },
@@ -39,7 +37,6 @@ const getTemplateByIdRepo = async (id) => {
   return JSONBigInt.parse(serialized);
 };
 
-// CREATE
 const createTemplateRepo = async (data) => {
   const created = await prisma.template_berkas.create({
     data,
@@ -49,7 +46,6 @@ const createTemplateRepo = async (data) => {
   return JSONBigInt.parse(serialized);
 };
 
-// UPDATE
 const updateTemplateRepo = async (id, data) => {
   const updated = await prisma.template_berkas.update({
     where: { id },
@@ -60,7 +56,6 @@ const updateTemplateRepo = async (id, data) => {
   return JSONBigInt.parse(serialized);
 };
 
-// DELETE
 const deleteTemplateRepo = async (id) => {
   const deleted = await prisma.template_berkas.delete({
     where: { id },

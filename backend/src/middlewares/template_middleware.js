@@ -1,7 +1,6 @@
 const { z } = require("zod");
 const { BadRequestError } = require("../utils/request");
 
-// GET ALL
 const validateGetTemplates = async (req, res, next) => {
   const validateQuery = z.object({
     nama: z.string().optional(),
@@ -15,7 +14,6 @@ const validateGetTemplates = async (req, res, next) => {
   next();
 };
 
-// GET BY ID
 const validateGetTemplateById = async (req, res, next) => {
   const validateParams = z.object({
     id: z.string(),
@@ -29,11 +27,10 @@ const validateGetTemplateById = async (req, res, next) => {
   next();
 };
 
-// CREATE
 const validateCreateTemplate = async (req, res, next) => {
   const validateBody = z.object({
     nama_berkas: z.string(),
-    file_path: z.string(), // kalau mau optional: z.string().optional()
+    file_path: z.string(),
   });
 
   const result = validateBody.safeParse(req.body);
@@ -44,7 +41,6 @@ const validateCreateTemplate = async (req, res, next) => {
   next();
 };
 
-// UPDATE
 const validateUpdateTemplate = async (req, res, next) => {
   const validateParams = z.object({
     id: z.string(),
@@ -68,7 +64,6 @@ const validateUpdateTemplate = async (req, res, next) => {
   next();
 };
 
-// DELETE
 const validateDeleteTemplate = async (req, res, next) => {
   const validateParams = z.object({
     id: z.string(),

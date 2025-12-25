@@ -1,4 +1,3 @@
-// repositories/dokumen_peminjaman_repository.js
 const { PrismaClient } = require("@prisma/client");
 const JSONBigInt = require("json-bigint");
 const prisma = new PrismaClient();

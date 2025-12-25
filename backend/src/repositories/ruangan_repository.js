@@ -53,7 +53,6 @@ const getRuangansRepo = async (
     };
   }
 
-  // Filter by fasilitas name
   if (fasilitas) {
     where.fasilitas = {
       some: {
@@ -67,7 +66,6 @@ const getRuangansRepo = async (
     };
   }
 
-  // Filter by kondisi
   if (kondisi) {
     where.fasilitas = {
       ...where.fasilitas,

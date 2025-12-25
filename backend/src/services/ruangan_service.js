@@ -60,7 +60,6 @@ const createRuanganService = async (ruangan) => {
   const { nama_ruangan, Gedung, lantai, kapasitas, status, jenis, fasilitas } =
     ruangan;
 
-  // Create ruangan first
   const createRuanganTable = await createRuanganRepo(
     nama_ruangan,
     Gedung,
@@ -70,12 +69,10 @@ const createRuanganService = async (ruangan) => {
     jenis
   );
 
-  // Create fasilitas if provided
   if (fasilitas && fasilitas.length > 0) {
     await createFasilitasRepo(createRuanganTable.id, fasilitas);
   }
 
-  // Get complete ruangan data with fasilitas
   const newRuang = await getRuanganByIdRepo(createRuanganTable.id);
 
   return newRuang;
@@ -90,7 +87,6 @@ const updateRuanganService = async (id, ruangan) => {
   const { nama_ruangan, Gedung, lantai, kapasitas, status, jenis, fasilitas } =
     ruangan;
 
-  // Update ruangan data
   const updateRuanganData = await updateRuanganRepo(
     id,
     nama_ruangan,
@@ -101,13 +97,11 @@ const updateRuanganService = async (id, ruangan) => {
     jenis
   );
 
-  // Update fasilitas if provided
   if (fasilitas && fasilitas.length > 0) {
     await deleteFasilitasRepo(id);
     await createFasilitasRepo(id, fasilitas);
   }
 
-  // Get complete updated ruangan data
   const updatedRuangan = await getRuanganByIdRepo(id);
 
   return updatedRuangan;
@@ -119,10 +113,8 @@ const deleteRuanganService = async (id) => {
     throw new NotFoundError("Ruangan not found");
   }
 
-  // Delete fasilitas first
   await deleteFasilitasRepo(id);
 
-  // Delete ruangan
   const deletedRuangan = await deleteRuanganRepo(id);
 
   return {

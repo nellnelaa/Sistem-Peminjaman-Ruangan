@@ -1,4 +1,3 @@
-// controllers/peminjaman_controller.js
 const { successResponse } = require("../utils/response.js");
 const {
   getPeminjamansService,
@@ -35,9 +34,7 @@ const getPeminjamanByIdController = async (req, res) => {
 
 const createPeminjamanController = async (req, res) => {
   const { body, files } = req;
-
   body.user_id = req.user.id;
-
   const data = await createPeminjamanService(body, files);
   successResponse(res, data);
 };
@@ -45,7 +42,6 @@ const createPeminjamanController = async (req, res) => {
 const updatePeminjamanController = async (req, res) => {
   const { id } = req.params;
   const { body, files } = req;
-
   const data = await updatePeminjamanService(id, body, files, req.user);
   successResponse(res, data);
 };
