@@ -10,7 +10,7 @@
 
 > Preview akan menampilkan **Landing Page Sistem Peminjaman Ruangan**
 
-<img src="landing-page.png" alt="preview">
+<img src="dashboard.png" alt="preview">
 
 ---
 
