@@ -130,6 +130,7 @@ Sistem ini cocok diterapkan pada **institusi pendidikan, organisasi, dan instans
 ```bash
 git clone https://github.com/nellnelaa/Sistem-Peminjaman-Ruangan.git
 cd Sistem-Peminjaman-Ruangan
+```
 
 ## ⚙️ Installation & Setup
 
@@ -138,18 +139,18 @@ cd Sistem-Peminjaman-Ruangan
 ```bash
 cd backend
 npm install
-
+```
 Buat file .env pada folder backend:
 ```bash
 DATABASE_URL=your_database_url
 JWT_SECRET=your_secret_key
 PORT=3000
-
+```
 Generate Prisma Client dan migrate database:
 ```bash
 npm run prisma:generate
 npm run prisma:refresh
-
+```
 Jalankan backend server:
 ```bash
 npm run dev
@@ -162,32 +163,29 @@ npm install
 npm run dev
 ```
 
-📚 How to Use
+## 📚 How to Use
+### 6. Manajemen Pengguna & Role
+- Role pengguna (User & Admin)
+- Hak akses berbeda sesuai peran
 
-Login / Register
+### 1. Login / Register
 Pengguna melakukan login atau registrasi untuk mengakses sistem.
 
-Ajukan Peminjaman Ruangan
+### 2. Ajukan Peminjaman Ruangan
+- Pilih ruangan yang tersedia
+- Tentukan tanggal dan durasi peminjaman
+- Upload dokumen pendukung peminjaman
 
-Pilih ruangan yang tersedia
+### 3. Verifikasi Dokumen
+- Sistem melakukan deteksi tanda tangan dan stempel menggunakan Machine Learning
+- Admin melakukan validasi akhir terhadap pengajuan
 
-Tentukan tanggal dan durasi peminjaman
+### 4. Monitoring Peminjaman
+- Cek status pengajuan peminjaman
+- Lihat riwayat peminjaman ruangan
 
-Upload dokumen pendukung peminjaman
 
-Verifikasi Dokumen
-
-Sistem melakukan deteksi tanda tangan dan stempel menggunakan Machine Learning
-
-Admin melakukan validasi akhir terhadap pengajuan
-
-Monitoring Peminjaman
-
-Cek status pengajuan peminjaman
-
-Lihat riwayat peminjaman ruangan
-
-©️ Credits
+## ©️ Credits
 
 Proyek ini dikembangkan sebagai Final Project Mata Kuliah Manajemen Proyek Informatika
 Universitas Pembangunan Nasional “Veteran” Jawa Timur
